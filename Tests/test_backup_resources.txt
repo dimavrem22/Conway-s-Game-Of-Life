@@ -1,0 +1,14 @@
+{
+    "structures": {
+        "Dot": {
+            "code": "(0,0)",
+            "height": "1",
+            "width": "1"
+        },
+        "Glider": {
+            "code": "(2,0) (0,1) (2,1) (1,2) (2,2)",
+            "height": "3",
+            "width": "3"
+        }
+    }
+}

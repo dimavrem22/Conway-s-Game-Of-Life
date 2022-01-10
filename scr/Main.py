@@ -26,10 +26,9 @@ def main():
     c = Controller(m, v)
     c.execute()
 
-
 def extract_argument(args: [str], key: str):
     """
-    searches through a list of arguments and identifies the value of a parameter with the provided key
+    Searches through a list of arguments and identifies the value of a parameter with the provided key.
     :param args: list of string arguments through which to parse
     :param key: the string which indicates the parameter that needs to be identified
     :return: the value of the parameter if present; None if parameter is not present

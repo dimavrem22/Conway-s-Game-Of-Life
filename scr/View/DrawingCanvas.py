@@ -1,6 +1,6 @@
 import tkinter
 from Model.IGameOfLifeModel import IGameOfLifeModel
-from Resources.GameResources import GameResources
+from Resources.GameUtils import GameUtils
 from View.IDrawingCanvas import IDrawingCanvas
 from View.IGameOfLifeView import IGameOfLifeView
 
@@ -95,10 +95,11 @@ class DrawingCanvas(IDrawingCanvas):
 
     def __add_cell(self, x: int, y: int, live: bool):
         """ Draws a cell in the canvas. """
-        cell_length = GameResources().cell_length
-        x0 = x * cell_length + 5
+        cell_length = GameUtils().cell_length
+        padding = GameUtils().canvas_padding
+        x0 = x * cell_length + padding
         x1 = x0 + cell_length
-        y0 = y * cell_length + 5
+        y0 = y * cell_length + padding
         y1 = y0 + cell_length
         cell_color = self.__style['dead cell color']
         if live:

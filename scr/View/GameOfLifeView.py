@@ -1,5 +1,5 @@
 from Controller.IController import IController
-from Resources.GameResources import GameResources
+from Resources.GameUtils import GameUtils
 from View.IGameOfLifeView import IGameOfLifeView
 from Model.IGameOfLifeModel import IGameOfLifeModel
 import tkinter
@@ -47,11 +47,15 @@ class GameOfLifeView(IGameOfLifeView):
     change_style(style):
         changes the coloring of the display to a specified style
 
+    update_struct_options(controller):
+        Updates the structure option menu after changes to the library have been made.
+
     __initialize_buttons():
         place the interactive components of the view into the window
 
     __set_control_options():
         create the frames necessary for some control options
+
     """
 
     def __init__(self, model: IGameOfLifeModel):
@@ -64,13 +68,13 @@ class GameOfLifeView(IGameOfLifeView):
         if model is None:
             raise ValueError('Model Cannot Be Null')
         self.__model = model
-        cell_length = GameResources.cell_length
-        self.__height = model.get_height() * cell_length + 10
+        cell_length = GameUtils.cell_length
+        self.__height = model.get_height() * cell_length + 5
         self.__width = model.get_width() * cell_length + 10
 
         # where cells will be displayed
         self.__canvas = DrawingCanvas(self, self.__width, self.__height, self.__model,
-                                      GameResources.coloring_styles["Light"])
+                                      GameUtils.coloring_styles["Light"])
         # widget containing all buttons
         self.__button_frame = tkinter.Frame(self, height=30, width=self.__width)
         # widget containing the color style control
@@ -79,16 +83,20 @@ class GameOfLifeView(IGameOfLifeView):
         self.__generate_structure_frame = tkinter.Frame(self.__button_frame, padx=20)
         # widget containing the speed control options
         self.__speed_slider = tkinter.Frame(self.__button_frame, padx=20)
+        # widget for managing structures
+        self.__manage_frame = tkinter.Frame(self, pady=5)
 
         self.__button_next = None
         self.__button_start = None
         self.__button_exit = None
         self.__button_reset = None
+        self.__button_manage = None
+        self.__button_add = None
+
+        self.__struct_option_menu = None
 
     def render(self):
-        """
-        initiates the view to provide a display of the model
-        """
+        """ Initiates the view to provide a display of the model. """
         self.__set_control_options()
         self.__initialize_buttons()
         self.__canvas.draw_game()
@@ -96,9 +104,7 @@ class GameOfLifeView(IGameOfLifeView):
         self.__canvas.mainloop()
 
     def __set_control_options(self):
-        """
-        create the frames necessary for some control option
-        """
+        """ Create the frames necessary for some control option. """
         # frame for color mode options
         view_mode_text = tkinter.Label(self.__view_mode_frame, text='View Mode: ', font=("Arial", 15))
         view_mode_text.pack(side='left')
@@ -111,7 +117,7 @@ class GameOfLifeView(IGameOfLifeView):
 
     def get_model_hash(self):
         """
-        used in ensuring that the same model is passed into the controller and the view
+        Used in ensuring that the same model is passed into the controller and the view.
         :return hash of the model object
         """
         return self.__model.__hash__()
@@ -154,7 +160,7 @@ class GameOfLifeView(IGameOfLifeView):
         speed_scale.pack(side='right')
 
         # color mode dropdown list
-        style_options = [str(key) for key in GameResources().coloring_styles.keys()]
+        style_options = [str(key) for key in GameUtils().coloring_styles.keys()]
         mode_menu_text = tkinter.StringVar(self.__view_mode_frame)
         mode_menu_text.set(style_options[0])
         view_mode_options = tkinter.OptionMenu(self.__view_mode_frame, mode_menu_text, *style_options,
@@ -163,14 +169,7 @@ class GameOfLifeView(IGameOfLifeView):
         view_mode_options.pack(side='right')
 
         # spawn pattern dropdown list
-        structure_options = [str(key) for key in GameResources().structures.keys()]
-        generate_menu_text = tkinter.StringVar(self.__generate_structure_frame)
-        generate_menu_text.set('Import')
-        generate_structure_options = tkinter.OptionMenu(self.__generate_structure_frame, generate_menu_text,
-                                                        *structure_options,
-                                                        command=lambda event, c='generate':
-                                                        controller.action_performed(c, event))
-        generate_structure_options.pack(side='right')
+        self.__initialize_struct_menu(controller)
 
     def toggle_start_stop_button(self, boolean: bool):
         """
@@ -183,9 +182,7 @@ class GameOfLifeView(IGameOfLifeView):
             self.__button_start['text'] = 'Start'
 
     def __initialize_buttons(self):
-        """
-        place the interactive components of the view into the window
-        """
+        """ Place the interactive components of the view into the window. """
         self.__button_exit.pack(side='left')
         self.__button_reset.pack(side='left')
         self.__button_next.pack(side='left')
@@ -194,10 +191,181 @@ class GameOfLifeView(IGameOfLifeView):
         self.__speed_slider.pack(side='left')
         self.__generate_structure_frame.pack(side='right')
         self.__button_frame.pack(side='top')
+        self.__button_add.pack(side='left')
+        self.__button_manage.pack(side='right')
+        self.__manage_frame.pack(side='bottom')
 
     def change_style(self, style_name: str):
         """
-        changes the coloring of the display to a specified style
+        Changes the coloring of the display to a specified style.
         :param style_name: the color style to which the view will change
         """
-        self.__canvas.change_style(GameResources.coloring_styles[style_name])
+        self.__canvas.change_style(GameUtils.coloring_styles[style_name])
+
+    def update_struct_options(self, controller: IController):
+        """
+        Recreates the menu options for structure generation after the library has been modified.
+        :param controller: controller which will listen for user input via option menu
+        """
+        self.__struct_option_menu.pack_forget()
+        self.__initialize_struct_menu(controller)
+
+    def __initialize_struct_menu(self, controller: IController):
+        """
+        Generates the option menu for the generation of structures in the game.
+        :param controller: controller which will listen for user input via option menu
+        """
+        structure_options = GameUtils("Resources/resources.txt").get_key_list("structures")
+        generate_menu_text = tkinter.StringVar(self.__generate_structure_frame)
+        generate_menu_text.set('Import')
+        self.__struct_option_menu = tkinter.OptionMenu(self.__generate_structure_frame, generate_menu_text,
+                                                       *structure_options,
+                                                       command=lambda event, c='generate':
+                                                       controller.action_performed(c, event))
+        self.__struct_option_menu.pack(side='right')
+
+        self.__button_add = tkinter.Button(self.__manage_frame, text='Add Structure',
+                                           command=lambda c='add structure': controller.action_performed(c))
+        self.__button_manage = tkinter.Button(self.__manage_frame, text='Manage Structures',
+                                              command=lambda c='manage structures': controller.action_performed(c))
+
+
+class StructAddView(tkinter.Tk):
+    """
+    A class used to represent the window popup for the addition of structures to the library.
+
+    Parameters
+    ----------
+    __button_frame: frame for buttons in the window
+    __add_button: button for the addition of a structure to the library
+    __cancel_button: exits the window without saving the structure to the library
+    __entry_frame: frame containing the text input
+    __entry_label: labels the location where the user will type structure name
+    __name_entry: object which allows user to enter text
+
+    Methods
+    -------
+    __init(controller):
+        Creates an instance of the StructureAddView, taking a controller which will listen to for user input.
+
+    GameUtils(controller):
+        Creates buttons featured in the window and sets a controller to listen for user input.
+
+
+    """
+
+    def __init__(self, controller: IController):
+        """
+        Creates an instance of the StructureAddView and populates the window with appropriate features.
+        :param controller: controller which will listen to for user input
+        """
+        super().__init__(className=' Structure Adder')
+        self.__button_frame = tkinter.Frame(self, padx=20, pady=20)
+        self.__add_button = None
+        self.__cancel_button = None
+        self.__entry_frame = tkinter.Frame(self, padx=20, pady=20)
+        self.__entry_frame.pack(side='top')
+        self.__entry_label = tkinter.Label(self.__entry_frame, text='Structure Name: ', font=("Arial", 15))
+        self.__entry_label.pack(side='left')
+        self.__entry_label.pack(side='left')
+        self.__name_entry = None
+        self.GameUtils(controller)
+        self.__name_entry.pack(side='right')
+        self.__add_button.pack(side='left')
+        self.__cancel_button.pack(side='right')
+        self.__button_frame.pack(side='top')
+
+    def GameUtils(self, controller: IController):
+        """
+        Creates the necessary buttons and sets the controller to listen for user input.
+        :param controller: controller which will listen to for user input
+        """
+        self.__add_button = tkinter.Button(self.__button_frame, text='Add',
+                                           command=lambda c='add structure':
+                                           controller.action_performed(c, self.__name_entry.get()))
+        self.__cancel_button = tkinter.Button(self.__button_frame, text='Cancel', fg='red', command=self.destroy)
+        self.__name_entry = tkinter.Entry(self.__entry_frame, width=25)
+
+
+class ManageStructureView(tkinter.Tk):
+    """
+    A class used to represent the window popup for the management of structure library.
+
+    Parameters
+    ----------
+    __exit_button: closes the window
+    __delete_button: deletes the selected structures
+    __default_button: used to reset the structure library
+    __button_frame: frame containing the buttons featured in the window
+    __check_frame: frame containing the checkboxes of structures from the library
+    __selected_list: list of structures that are selected by the user
+
+    Methods
+    -------
+    __init(controller):
+        Creates an instance of the StructureAddView, taking a controller which will listen to for user input.
+
+    __initialize_checkboxes():
+        Generates the checkboxes for each structure.
+
+    GameUtils(controller):
+        Generates the buttons and sets the controller to listen for user input.
+
+    __update_selected_list():
+         Modifies the __selected_list to contain only the structures selected by the user via checkboxes.
+
+
+
+
+
+    """
+
+    def __init__(self, controller: IController):
+        """
+         Creates an instance of the StructureAddView.
+        :param controller: Controller which will listen to for user input
+        """
+        super().__init__(className=' Structure Manager')
+        self.__exit_button = None
+        self.__delete_button = None
+        self.__default_button = None
+        self.__button_frame = tkinter.Frame(self, padx=20, pady=20)
+        self.__check_frame = tkinter.Frame(self, padx=20, pady=20, width=1000)
+        self.__selected_list = []
+        self.__initialize_check_boxes()
+        self.__check_frame.pack(side='top', anchor='w')
+        self.GameUtils(controller)
+        self.__button_frame.pack(side='bottom')
+
+    def __initialize_check_boxes(self):
+        """ Generates the checkboxes for each structure. """
+        idx = 0
+        for s in GameUtils("Resources/resources.txt").get_key_list("structures"):
+            c = tkinter.Checkbutton(self.__check_frame, text=s)
+            c['command'] = lambda struct=c['text']: self.__update_selected_list(struct)
+            c.pack(side='top', anchor='w')
+            idx += 1
+
+    def GameUtils(self, controller: IController):
+        """
+        Generates the buttons and sets the controller to listen for user input.
+        :param controller: controller listening to user input
+        """
+        self.__delete_button = tkinter.Button(self.__button_frame, text='Delete', padx='15',
+                                              command=lambda c='delete':
+                                              controller.action_performed(c, self.__selected_list))
+        self.__delete_button.pack(side='left')
+        self.__default_button = tkinter.Button(self.__button_frame, text='Reset To Default', padx='15',
+                                               command=lambda c='default':
+                                               controller.action_performed(c))
+        self.__default_button.pack(side='left')
+        self.__exit_button = tkinter.Button(self.__button_frame, text='Close', fg='red',
+                                            padx='15', command=self.destroy)
+        self.__exit_button.pack(side='left')
+
+    def __update_selected_list(self, struct_name: str):
+        """Modifies the __selected_list to contain only the structures selected by the user via checkboxes. """
+        if struct_name in self.__selected_list:
+            self.__selected_list.remove(struct_name)
+        else:
+            self.__selected_list.append(struct_name)
