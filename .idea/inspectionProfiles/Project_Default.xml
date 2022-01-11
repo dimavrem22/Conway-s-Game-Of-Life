@@ -1,0 +1,31 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="time.time.time" />
+          <option value="__view" />
+          <option value="__play" />
+          <option value="__speed" />
+          <option value="__model" />
+          <option value="__height" />
+          <option value="__button_reset" />
+          <option value="__button_next" />
+          <option value="__button_frame" />
+          <option value="__canvas" />
+          <option value="__width" />
+          <option value="__button_exit" />
+          <option value="__button_start" />
+          <option value="__speed_slider" />
+          <option value="__view_mode_frame" />
+          <option value="__generate_structure_frame" />
+          <option value="__style" />
+          <option value="__background_cells" />
+          <option value="__surface_cells" />
+          <option value="__file_path" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
