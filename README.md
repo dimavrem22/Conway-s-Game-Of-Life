@@ -72,7 +72,7 @@ Users can add desired patterns to the game library by navigating to the <i><b>Ad
 Users can delete undesired patterns from the game library by navigating to the <i><b>Manage Structure</b></i>
 button:<br/>
 
-<img src="/Users/dimavremenko/Documents/GitHub/Conway-s-Game-Of-Life/scr/Resources/Game Demo Images/Structure Library Management.png" width="800"/><br/>
+<img src="scr/Resources/Game Demo Images/Structure Library Management.png" width="800"/><br/>
 <img src="scr/Resources/Game Demo Images/Deleting Structures From Library Result.png" width="800"><br/>
 
 *Deleted patterns will be absent from the library after the termination of the program! <br/>
