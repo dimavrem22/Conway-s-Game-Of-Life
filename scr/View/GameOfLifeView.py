@@ -313,11 +313,6 @@ class ManageStructureView(tkinter.Tk):
 
     __update_selected_list():
          Modifies the __selected_list to contain only the structures selected by the user via checkboxes.
-
-
-
-
-
     """
 
     def __init__(self, controller: IController):
