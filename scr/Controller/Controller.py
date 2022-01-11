@@ -164,6 +164,7 @@ class Controller(IController):
             self.__automatic___advance()
         else:
             self.__advance()
+        self.__view.toggle_start_stop_button(self.__play)
 
     def __advance(self):
         """ Method which updates the model and redraws the view. Used to progress the game. """

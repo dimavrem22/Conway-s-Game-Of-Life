@@ -11,8 +11,8 @@ def main():
     In the absence of commandline arguments, width and height are set to default values of 30 and 50 cells.
     """
     args = sys.argv
-    game_height = extract_argument(args, '--height')
-    game_width = extract_argument(args, '--width')
+    game_height = extract_argument(args, '-height')
+    game_width = extract_argument(args, '-width')
 
     # setting default values for game height and width in case they are not provided
     if game_width is None:

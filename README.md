@@ -1,3 +1,2 @@
 # Game-Of-Life
 
-Test
