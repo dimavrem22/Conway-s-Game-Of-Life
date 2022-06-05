@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b3b5e261-b36d-4022-ac21-79594d88da11" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/scr/Resources/resources.txt" beforeDir="false" afterPath="$PROJECT_DIR$/scr/Resources/resources.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
